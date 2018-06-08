@@ -22,8 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
@@ -43,7 +41,7 @@ class RunOnVertxThreadTest {
       this.vertx = vertx;
     }
 
-    public synchronized WebClient getWebClient() {
+    public WebClient getWebClient() {
       WebClient webClient = Vertx.currentContext().get(WEB_CLIENT_ID);
       if (webClient == null) {
         webClient = WebClient.create(vertx);
@@ -59,6 +57,5 @@ class RunOnVertxThreadTest {
     SimulatorOfDumbCodeOutOfOurControl dumb = new SimulatorOfDumbCodeOutOfOurControl(vertx);
     WebClient webClient = dumb.getWebClient();
     // use webClient here if desired
-    assertTrue(context.awaitCompletion(60, TimeUnit.SECONDS));
   }
 }
