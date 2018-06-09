@@ -17,45 +17,21 @@ package io.vertx.junit5;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.VertxThread;
-import io.vertx.ext.web.client.WebClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
 @DisplayName("Configure extension to run tests in a VertxThread")
 class RunOnVertxThreadTest {
   @Test
-  public void ensureVertxThread() {
-    assertTrue(Thread.currentThread() instanceof VertxThread);
-  }
-
-  // NOTE: the code below simulates the heinousness that we're dealing with as a reproable test case
-  static class SimulatorOfDumbCodeOutOfOurControl {
-    public String WEB_CLIENT_ID;
-    public Vertx vertx;
-
-    public SimulatorOfDumbCodeOutOfOurControl(Vertx vertx) {
-      this.vertx = vertx;
-    }
-
-    public WebClient getWebClient() {
-      WebClient webClient = Vertx.currentContext().get(WEB_CLIENT_ID);
-      if (webClient == null) {
-        webClient = WebClient.create(vertx);
-        Vertx.currentContext().put(WEB_CLIENT_ID, webClient);
-      }
-      return webClient;
-    }
-  }
-
-  @Test
-  public void reproducibleClientScenario(Vertx vertx, VertxTestContext context)
-    throws InterruptedException {
-    SimulatorOfDumbCodeOutOfOurControl dumb = new SimulatorOfDumbCodeOutOfOurControl(vertx);
-    WebClient webClient = dumb.getWebClient();
-    // use webClient here if desired
+  public void ensureVertxThread(Vertx vertx) {
+    vertx.runOnContext(event -> {
+      assertTrue(Thread.currentThread() instanceof VertxThread);
+      assertNotNull(Vertx.currentContext());
+    });
   }
 }
